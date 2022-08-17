@@ -14,6 +14,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 import java.util.Map;
 
@@ -60,6 +61,11 @@ public class EdenTradeCommand extends BaseCommand {
         Player player = (Player) offlinePlayer;
 
         // Todo: Check if player had required permission
+        if (!playerHasRequiredPermissions(trade.getRequiredPermissions(), player)) {
+            // Need perm
+            player.sendMessage("No perm");
+            return;
+        }
 
         // Todo: Check if player had required item
 
@@ -72,6 +78,17 @@ public class EdenTradeCommand extends BaseCommand {
         // Todo: Give result permissions to player
 
         // Todo: Well done !
+    }
+
+    private static boolean playerHasRequiredPermissions(Map<String, Boolean> requiredPermissions, Player player) {
+        for (Map.Entry<String, Boolean> perm : requiredPermissions.entrySet()) {
+            if (perm.getValue()) {
+                if (!player.hasPermission(perm.getKey())) return false;
+            } else {
+                if (player.hasPermission(perm.getKey())) return false;
+            }
+        }
+        return true;
     }
 
     private static String getHelpMessage() {
