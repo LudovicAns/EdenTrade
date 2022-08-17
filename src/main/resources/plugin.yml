@@ -1,0 +1,9 @@
+name: EdenTrade
+version: '${project.version}'
+main: fr.edencraft.edentrade.EdenTrade
+api-version: 1.18
+prefix: EdenTrade
+softdepend: [ ItemsAdder, Eco, EcoItems, EcoArmor, EcoEnchant ]
+authors: [ NayeOne ]
+description: Used to trade ItemsAdder items to get Eco item. You can also make basic trade.
+website: https://github.com/EdenStacks
