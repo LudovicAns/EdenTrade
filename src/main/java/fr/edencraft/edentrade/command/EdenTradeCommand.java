@@ -3,7 +3,6 @@ package fr.edencraft.edentrade.command;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import dev.lone.itemsadder.api.CustomStack;
-import dev.lone.itemsadder.api.ItemsAdder;
 import fr.edencraft.edentrade.EdenTrade;
 import fr.edencraft.edentrade.content.lang.Fr;
 import fr.edencraft.edentrade.manager.ConfigurationManager;
@@ -16,11 +15,8 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -84,7 +80,6 @@ public class EdenTradeCommand extends BaseCommand {
         if (!playerHadRequiredItems(trade.getRequiredItems(), player)) {
             // Missing items.
             player.sendMessage("Missing items");
-            return;
         }
 
         // Todo: Check if player had enough place in his inventory to give result items
@@ -100,7 +95,7 @@ public class EdenTradeCommand extends BaseCommand {
 
     private static boolean playerHadRequiredItems(Set<ItemStack> requireditems, Player player) {
         for (ItemStack item : requireditems) {
-            boolean isItemsAdderItem = CustomStack.byItemStack(item) != null ? true : false;
+            boolean isItemsAdderItem = CustomStack.byItemStack(item) != null;
             int amountNeeded = item.getAmount();
             @Nullable ItemStack[] contents = player.getInventory().getContents();
 
@@ -130,14 +125,9 @@ public class EdenTradeCommand extends BaseCommand {
         System.out.println(item1.getType().name() + "|" + item2.getType().name());
         if (!item1.getType().equals(item2.getType())) return false;
         if (item1.getItemMeta().hasCustomModelData() && item2.getItemMeta().hasCustomModelData()) {
-            if (item1.getItemMeta().getCustomModelData() != item2.getItemMeta().getCustomModelData()) return false;
-        } else if (!item1.getItemMeta().hasCustomModelData() && !item2.getItemMeta().hasCustomModelData()) {
-            return true;
-        } else {
-            return false;
-        }
+            return item1.getItemMeta().getCustomModelData() == item2.getItemMeta().getCustomModelData();
+        } else return !item1.getItemMeta().hasCustomModelData() && !item2.getItemMeta().hasCustomModelData();
         // Add more comparaison later (like displayname, lore, etc).
-        return true;
     }
 
     private static boolean isEqual(CustomStack item1, CustomStack item2) {
@@ -161,7 +151,7 @@ public class EdenTradeCommand extends BaseCommand {
         StringBuilder builder = new StringBuilder();
 
         for (String line : cfg.getStringList("help-message")) {
-            builder.append(new ColoredText(line).treat() + "\n");
+            builder.append(new ColoredText(line).treat()).append("\n");
         }
 
         return builder.toString();
