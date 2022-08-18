@@ -14,8 +14,11 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Set;
 
 @CommandAlias("edentrade")
 public class EdenTradeCommand extends BaseCommand {
@@ -60,7 +63,7 @@ public class EdenTradeCommand extends BaseCommand {
         Player player = (Player) offlinePlayer;
 
         // Todo: Check if player had required permission
-        if (!playerHasRequiredPermissions(trade.getRequiredPermissions(), player)) {
+        if (!playerHadRequiredPermissions(trade.getRequiredPermissions(), player)) {
             // Need perm
             player.sendMessage("No perm");
             return;
@@ -79,7 +82,17 @@ public class EdenTradeCommand extends BaseCommand {
         // Todo: Well done !
     }
 
-    private static boolean playerHasRequiredPermissions(Map<String, Boolean> requiredPermissions, Player player) {
+    private static boolean playerHadRequiredItems(Set<ItemStack> requireditems, Player player) {
+        for (ItemStack item : requireditems) {
+            int amountNeeded = item.getAmount();
+            @Nullable ItemStack[] contents = player.getInventory().getContents();
+
+            // Search item in player invenory. (Care to custom item ...)
+        }
+        return true;
+    }
+
+    private static boolean playerHadRequiredPermissions(Map<String, Boolean> requiredPermissions, Player player) {
         for (Map.Entry<String, Boolean> perm : requiredPermissions.entrySet()) {
             if (perm.getValue()) {
                 if (!player.hasPermission(perm.getKey())) return false;
