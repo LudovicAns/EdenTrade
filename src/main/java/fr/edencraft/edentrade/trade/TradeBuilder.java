@@ -130,7 +130,7 @@ public class TradeBuilder {
         int modelId = section.getInt("model-id", 10000);
         int amount = section.getInt("amount", 1);
 
-        Material material = Material.getMaterial(materialName);
+        Material material = Material.getMaterial(materialName.toUpperCase());
         material = material == null ? Material.STONE : material;
 
         ItemStack itemStack = new ItemStack(material, amount);
