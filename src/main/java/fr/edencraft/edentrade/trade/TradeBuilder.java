@@ -127,16 +127,18 @@ public class TradeBuilder {
 
     private ItemStack buildClassicItem(ConfigurationSection section) {
         String materialName = section.getString("material", Material.STONE.name());
-        int modelId = section.getInt("model-id", 10000);
+        int modelId = section.getInt("model-id");
         int amount = section.getInt("amount", 1);
 
         Material material = Material.getMaterial(materialName.toUpperCase());
         material = material == null ? Material.STONE : material;
 
         ItemStack itemStack = new ItemStack(material, amount);
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setCustomModelData(modelId);
-        itemStack.setItemMeta(itemMeta);
+        if (modelId != 0) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemMeta.setCustomModelData(modelId);
+            itemStack.setItemMeta(itemMeta);
+        }
 
         return itemStack;
     }
