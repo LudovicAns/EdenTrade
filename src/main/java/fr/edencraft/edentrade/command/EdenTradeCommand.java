@@ -10,6 +10,7 @@ import fr.edencraft.edentrade.trade.Trade;
 import fr.edencraft.edentrade.trade.TradeBuildException;
 import fr.edencraft.edentrade.trade.TradeBuilder;
 import fr.edencraft.edentrade.utils.ColoredText;
+import fr.edencraft.edentrade.utils.LuckPermsUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -70,35 +71,37 @@ public class EdenTradeCommand extends BaseCommand {
 
         Player player = (Player) offlinePlayer;
 
-        // Todo: Check if player had required permission
         if (!playerHadRequiredPermissions(trade.getRequiredPermissions(), player)) {
             // Need perm
             player.sendMessage("No perm");
             return;
         }
 
-        // Todo: Check if player had required item
         if (!playerHadRequiredItems(trade.getRequiredItems(), player)) {
             // Missing items.
             player.sendMessage("Missing items");
             return;
         }
 
-        // Todo: Check if player had enough place in his inventory to give result items
         if (!playerHadEnoughPlace(trade.getResultItems().size(), player.getInventory())) {
             // Not enough place
             player.sendMessage("Vous n'avavez pas assez de place dans votre inventaire.");
             return;
         }
-
-        // Todo: Take all required items from player inventory
         removeRequiredItemsFromPlayer(trade.getRequiredItems(), player);
+        giveResultItemToPlayer(trade.getResultItems(), player);
+        giveResultPermissionToPlayer(trade.getResultPermissions(), player);
+    }
 
-        // Todo: Give all result items to player inventory
+    private static void giveResultPermissionToPlayer(Map<String, Boolean> resultPermissions, Player player) {
+        resultPermissions.forEach((key, value) -> {
+            if (value && !player.hasPermission(key)) LuckPermsUtils.addPlayerPermission(player, key);
+            else LuckPermsUtils.removePlayerPermission(player, key);
+        });
+    }
 
-        // Todo: Give result permissions to player
-
-        // Well done !
+    private static void giveResultItemToPlayer(Set<ItemStack> resultItems, Player player) {
+        resultItems.forEach(itemStack -> player.getInventory().addItem(itemStack));
     }
 
     private static void removeRequiredItemsFromPlayer(Set<ItemStack> requiredItems, Player player) {
