@@ -92,12 +92,42 @@ public class EdenTradeCommand extends BaseCommand {
         }
 
         // Todo: Take all required items from player inventory
+        removeRequiredItemsFromPlayer(trade.getRequiredItems(), player);
 
         // Todo: Give all result items to player inventory
 
         // Todo: Give result permissions to player
 
         // Well done !
+    }
+
+    private static void removeRequiredItemsFromPlayer(Set<ItemStack> requiredItems, Player player) {
+        for (ItemStack item : requiredItems) {
+            boolean isItemsAdderItem = CustomStack.byItemStack(item) != null;
+            int amountNeeded = item.getAmount();
+            @Nullable ItemStack[] contents = player.getInventory().getStorageContents();
+
+            for (ItemStack inventoryItem : contents) {
+                if (amountNeeded <= 0) break;
+                if (inventoryItem == null || inventoryItem.getType().equals(Material.AIR)) continue;
+
+                if (isItemsAdderItem && CustomStack.byItemStack(inventoryItem) != null) {
+                    if (isEqual(CustomStack.byItemStack(item), CustomStack.byItemStack(inventoryItem))) {
+                        int amount = inventoryItem.getAmount();
+                        if (amount < amountNeeded) inventoryItem.setAmount(0);
+                        else inventoryItem.setAmount(amount - amountNeeded);
+                        amountNeeded -= amount;
+                    }
+                } else if (!isItemsAdderItem && CustomStack.byItemStack(inventoryItem) == null) {
+                    if (isEqual(item, inventoryItem)) {
+                        int amount = inventoryItem.getAmount();
+                        if (amount < amountNeeded) inventoryItem.setAmount(0);
+                        else inventoryItem.setAmount(amount - amountNeeded);
+                        amountNeeded -= amount;
+                    }
+                }
+            }
+        }
     }
 
     private static boolean playerHadEnoughPlace(int slotNeeded, PlayerInventory playerInventory) {
@@ -116,7 +146,7 @@ public class EdenTradeCommand extends BaseCommand {
         for (ItemStack item : requireditems) {
             boolean isItemsAdderItem = CustomStack.byItemStack(item) != null;
             int amountNeeded = item.getAmount();
-            @Nullable ItemStack[] contents = player.getInventory().getContents();
+            @Nullable ItemStack[] contents = player.getInventory().getStorageContents();
 
             for (ItemStack inventoryItem : contents) {
                 if (amountNeeded <= 0) break;
@@ -149,8 +179,7 @@ public class EdenTradeCommand extends BaseCommand {
     }
 
     private static boolean isEqual(CustomStack item1, CustomStack item2) {
-        // Need to be investigated because this function is a first try not tested.
-        return item1.equals(item2);
+        return item1.getId().equals(item2.getId());
     }
 
     private static boolean playerHadRequiredPermissions(Map<String, Boolean> requiredPermissions, Player player) {
