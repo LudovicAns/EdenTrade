@@ -13,14 +13,14 @@ import java.util.*;
 
 public class TradeBuilder {
 
-    private FileConfiguration cfg;
-    private String name;
+    private final FileConfiguration cfg;
+    private final String name;
 
-    private List<ItemStack> requiredItems = new ArrayList<>();
-    private Map<String, Boolean> requiredPermissions = new HashMap<>();
+    private final List<ItemStack> requiredItems = new ArrayList<>();
+    private final Map<String, Boolean> requiredPermissions = new HashMap<>();
 
-    private List<ItemStack> resultItems = new ArrayList<>();
-    private Map<String, Boolean> resultPermissions = new HashMap<>();
+    private final List<ItemStack> resultItems = new ArrayList<>();
+    private final Map<String, Boolean> resultPermissions = new HashMap<>();
 
     public TradeBuilder(FileConfiguration cfg) {
         this.cfg = cfg;
@@ -82,7 +82,7 @@ public class TradeBuilder {
     }
 
     private Map.Entry<String, Boolean> parsePermission(String permission) {
-        String key = null;
+        String key;
         boolean value = true;
 
         if (permission.startsWith("!")) {
@@ -92,7 +92,7 @@ public class TradeBuilder {
             key = permission;
         }
 
-        return new AbstractMap.SimpleEntry<String, Boolean>(key, value);
+        return new AbstractMap.SimpleEntry<>(key, value);
     }
 
     private boolean isUsableName() {
@@ -121,22 +121,23 @@ public class TradeBuilder {
     }
 
     private boolean isCustomItem(ConfigurationSection section) {
-        if (section.contains("item") && !section.getString("item").isEmpty()) return true;
-        return false;
+        return section.contains("item") && !section.getString("item").isEmpty();
     }
 
     private ItemStack buildClassicItem(ConfigurationSection section) {
         String materialName = section.getString("material", Material.STONE.name());
-        int modelId = section.getInt("model-id", 10000);
+        int modelId = section.getInt("model-id");
         int amount = section.getInt("amount", 1);
 
-        Material material = Material.getMaterial(materialName);
+        Material material = Material.getMaterial(materialName.toUpperCase());
         material = material == null ? Material.STONE : material;
 
         ItemStack itemStack = new ItemStack(material, amount);
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setCustomModelData(modelId);
-        itemStack.setItemMeta(itemMeta);
+        if (modelId != 0) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemMeta.setCustomModelData(modelId);
+            itemStack.setItemMeta(itemMeta);
+        }
 
         return itemStack;
     }
