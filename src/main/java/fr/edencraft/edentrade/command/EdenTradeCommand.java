@@ -17,6 +17,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -80,9 +81,15 @@ public class EdenTradeCommand extends BaseCommand {
         if (!playerHadRequiredItems(trade.getRequiredItems(), player)) {
             // Missing items.
             player.sendMessage("Missing items");
+            return;
         }
 
         // Todo: Check if player had enough place in his inventory to give result items
+        if (!playerHadEnoughPlace(trade.getResultItems().size(), player.getInventory())) {
+            // Not enough place
+            player.sendMessage("Vous n'avavez pas assez de place dans votre inventaire.");
+            return;
+        }
 
         // Todo: Take all required items from player inventory
 
@@ -90,7 +97,19 @@ public class EdenTradeCommand extends BaseCommand {
 
         // Todo: Give result permissions to player
 
-        // Todo: Well done !
+        // Well done !
+    }
+
+    private static boolean playerHadEnoughPlace(int slotNeeded, PlayerInventory playerInventory) {
+        return calculateFreeSlot(playerInventory) >= slotNeeded;
+    }
+
+    private static int calculateFreeSlot(PlayerInventory playerInventory) {
+        int count = 0;
+        for (ItemStack item : playerInventory.getStorageContents()) {
+            if (item == null) count++;
+        }
+        return count;
     }
 
     private static boolean playerHadRequiredItems(Set<ItemStack> requireditems, Player player) {
@@ -122,7 +141,6 @@ public class EdenTradeCommand extends BaseCommand {
     }
 
     private static boolean isEqual(ItemStack item1, ItemStack item2) {
-        System.out.println(item1.getType().name() + "|" + item2.getType().name());
         if (!item1.getType().equals(item2.getType())) return false;
         if (item1.getItemMeta().hasCustomModelData() && item2.getItemMeta().hasCustomModelData()) {
             return item1.getItemMeta().getCustomModelData() == item2.getItemMeta().getCustomModelData();
