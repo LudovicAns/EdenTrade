@@ -10,6 +10,7 @@ import fr.edencraft.edentrade.trade.Trade;
 import fr.edencraft.edentrade.trade.TradeBuildException;
 import fr.edencraft.edentrade.trade.TradeBuilder;
 import fr.edencraft.edentrade.utils.ColoredText;
+import fr.edencraft.edentrade.utils.LuckPermsUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -17,6 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -69,35 +71,85 @@ public class EdenTradeCommand extends BaseCommand {
 
         Player player = (Player) offlinePlayer;
 
-        // Todo: Check if player had required permission
         if (!playerHadRequiredPermissions(trade.getRequiredPermissions(), player)) {
             // Need perm
             player.sendMessage("No perm");
             return;
         }
 
-        // Todo: Check if player had required item
         if (!playerHadRequiredItems(trade.getRequiredItems(), player)) {
             // Missing items.
             player.sendMessage("Missing items");
+            return;
         }
 
-        // Todo: Check if player had enough place in his inventory to give result items
+        if (!playerHadEnoughPlace(trade.getResultItems().size(), player.getInventory())) {
+            // Not enough place
+            player.sendMessage("Vous n'avavez pas assez de place dans votre inventaire.");
+            return;
+        }
+        removeRequiredItemsFromPlayer(trade.getRequiredItems(), player);
+        giveResultItemToPlayer(trade.getResultItems(), player);
+        giveResultPermissionToPlayer(trade.getResultPermissions(), player);
+    }
 
-        // Todo: Take all required items from player inventory
+    private static void giveResultPermissionToPlayer(Map<String, Boolean> resultPermissions, Player player) {
+        resultPermissions.forEach((key, value) -> {
+            if (value && !player.hasPermission(key)) LuckPermsUtils.addPlayerPermission(player, key);
+            else LuckPermsUtils.removePlayerPermission(player, key);
+        });
+    }
 
-        // Todo: Give all result items to player inventory
+    private static void giveResultItemToPlayer(Set<ItemStack> resultItems, Player player) {
+        resultItems.forEach(itemStack -> player.getInventory().addItem(itemStack));
+    }
 
-        // Todo: Give result permissions to player
+    private static void removeRequiredItemsFromPlayer(Set<ItemStack> requiredItems, Player player) {
+        for (ItemStack item : requiredItems) {
+            boolean isItemsAdderItem = CustomStack.byItemStack(item) != null;
+            int amountNeeded = item.getAmount();
+            @Nullable ItemStack[] contents = player.getInventory().getStorageContents();
 
-        // Todo: Well done !
+            for (ItemStack inventoryItem : contents) {
+                if (amountNeeded <= 0) break;
+                if (inventoryItem == null || inventoryItem.getType().equals(Material.AIR)) continue;
+
+                if (isItemsAdderItem && CustomStack.byItemStack(inventoryItem) != null) {
+                    if (isEqual(CustomStack.byItemStack(item), CustomStack.byItemStack(inventoryItem))) {
+                        int amount = inventoryItem.getAmount();
+                        if (amount < amountNeeded) inventoryItem.setAmount(0);
+                        else inventoryItem.setAmount(amount - amountNeeded);
+                        amountNeeded -= amount;
+                    }
+                } else if (!isItemsAdderItem && CustomStack.byItemStack(inventoryItem) == null) {
+                    if (isEqual(item, inventoryItem)) {
+                        int amount = inventoryItem.getAmount();
+                        if (amount < amountNeeded) inventoryItem.setAmount(0);
+                        else inventoryItem.setAmount(amount - amountNeeded);
+                        amountNeeded -= amount;
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean playerHadEnoughPlace(int slotNeeded, PlayerInventory playerInventory) {
+        return calculateFreeSlot(playerInventory) >= slotNeeded;
+    }
+
+    private static int calculateFreeSlot(PlayerInventory playerInventory) {
+        int count = 0;
+        for (ItemStack item : playerInventory.getStorageContents()) {
+            if (item == null) count++;
+        }
+        return count;
     }
 
     private static boolean playerHadRequiredItems(Set<ItemStack> requireditems, Player player) {
         for (ItemStack item : requireditems) {
             boolean isItemsAdderItem = CustomStack.byItemStack(item) != null;
             int amountNeeded = item.getAmount();
-            @Nullable ItemStack[] contents = player.getInventory().getContents();
+            @Nullable ItemStack[] contents = player.getInventory().getStorageContents();
 
             for (ItemStack inventoryItem : contents) {
                 if (amountNeeded <= 0) break;
@@ -122,7 +174,6 @@ public class EdenTradeCommand extends BaseCommand {
     }
 
     private static boolean isEqual(ItemStack item1, ItemStack item2) {
-        System.out.println(item1.getType().name() + "|" + item2.getType().name());
         if (!item1.getType().equals(item2.getType())) return false;
         if (item1.getItemMeta().hasCustomModelData() && item2.getItemMeta().hasCustomModelData()) {
             return item1.getItemMeta().getCustomModelData() == item2.getItemMeta().getCustomModelData();
@@ -131,8 +182,7 @@ public class EdenTradeCommand extends BaseCommand {
     }
 
     private static boolean isEqual(CustomStack item1, CustomStack item2) {
-        // Need to be investigated because this function is a first try not tested.
-        return item1.equals(item2);
+        return item1.getId().equals(item2.getId());
     }
 
     private static boolean playerHadRequiredPermissions(Map<String, Boolean> requiredPermissions, Player player) {
