@@ -22,6 +22,9 @@ public class TradeBuilder {
     private final List<ItemStack> resultItems = new ArrayList<>();
     private final Map<String, Boolean> resultPermissions = new HashMap<>();
 
+    private final List<String> resultCommands = new ArrayList<>();
+    private int extraSlotNeeded = 0;
+
     public TradeBuilder(FileConfiguration cfg) {
         this.cfg = cfg;
         this.name = cfg.getName();
@@ -57,11 +60,16 @@ public class TradeBuilder {
 
         for (String key : cfg.getConfigurationSection("result.items").getKeys(false)) {
             ConfigurationSection section = cfg.getConfigurationSection("result.items." + key);
-            ItemStack item = getItemByConfigurationSection(section);
-            if (item == null) {
-                throw new TradeBuildException("Items " + key + " can't be loaded.", this);
+            if (section.contains("command")) {
+                resultCommands.add(section.getString("command"));
+                extraSlotNeeded += section.getInt("amount");
+            } else {
+                ItemStack item = getItemByConfigurationSection(section);
+                if (item == null) {
+                    throw new TradeBuildException("Items " + key + " can't be loaded.", this);
+                }
+                resultItems.add(item);
             }
-            resultItems.add(item);
         }
 
         if (cfg.contains("result.permissions")) {
@@ -77,7 +85,9 @@ public class TradeBuilder {
                 Set.copyOf(this.requiredItems),
                 new HashMap<>(this.requiredPermissions),
                 Set.copyOf(this.resultItems),
-                new HashMap<>(this.resultPermissions)
+                new HashMap<>(this.resultPermissions),
+                Set.copyOf(this.resultCommands),
+                extraSlotNeeded
         );
     }
 

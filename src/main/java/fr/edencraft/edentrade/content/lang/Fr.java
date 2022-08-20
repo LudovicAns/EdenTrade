@@ -10,8 +10,13 @@ public class Fr {
     
     help-message:
       - "&3========== &6EdenTrade Aide &3=========="
-      - "&f- &b/command &7: &eAide ici."
+      - "&f- &b/edentrade file <joueur> <trade.yml> &7: &eRéalise le trade 'trade.yml' pour le joueur donné."
       - "&3========== &6EdenTrade Aide &3=========="
+      
+    unknown-trade-file: "&cLe fichier de trade {0} n'existe pas."
+    missing-trade-permissions: "&cVous n'avez pas les permissions pour réaliser cet échange."
+    missing-trade-items: "&cIl vous manque des items pour réaliser cet échange."
+    missing-inventory-space: "&cVous n'avez pas assez de place dans votre inventaire pour réaliser cet échange."
     """;
 
 }

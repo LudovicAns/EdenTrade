@@ -7,13 +7,8 @@ public class CustomTrade {
               # Needed items.
               items:
                 '1':
-                  item: "itemsadder:namespace__itemname_1"
+                  item: "itemsadder:iasurvival__ruby"
                   # material: leather
-                  # model-id: 10000
-                  amount: 16
-                '2':
-                  item: "itemsadder:namespace__itemname_2"
-                  # material: feather
                   # model-id: 10000
                   amount: 8
               # Needed permissions.
@@ -25,12 +20,16 @@ public class CustomTrade {
               # Items to give.
               items:
                 '1':
-                  item: "itemsadder:namespace__itemname_3"
+                  item: "itemsadder:iasurvival__bloodnite_sword"
                   # material: diamond
                   # model-id: 10000
-                  amount: 4
+                  amount: 1
+                '2':
+                  command: 'say Hello {player} !'
+                  # Amount of slot used by the command
+                  amount: 0
               # Permissions to give.
               permissions:
-              - "permisssion.vanilla.traded"
+              - "permisssion.custom.traded"
             """;
 }

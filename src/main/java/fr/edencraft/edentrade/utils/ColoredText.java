@@ -1,6 +1,5 @@
 package fr.edencraft.edentrade.utils;
 
-
 import net.md_5.bungee.api.ChatColor;
 
 import java.util.regex.Matcher;
