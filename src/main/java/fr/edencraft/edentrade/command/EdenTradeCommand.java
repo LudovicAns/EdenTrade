@@ -35,6 +35,31 @@ public class EdenTradeCommand extends BaseCommand {
         commandSender.sendMessage(getHelpMessage());
     }
 
+    @Subcommand("reload|rl")
+    @Syntax("[fileName]")
+    @CommandCompletion("@etreload")
+    @CommandPermission(basePermission + ".reload")
+    public static void onReload(CommandSender sender, @Optional String fileName){
+        FileConfiguration lang = cm.getConfigurationFile("Fr.yml");
+        if (fileName != null && !fileName.isEmpty()) {
+            if (cm.getConfigurationFile(fileName) != null) {
+                cm.reloadFile(fileName);
+                sender.sendMessage(new ColoredText(
+                        lang.getString("reload-file")
+                                .replaceAll("\\{filename}", fileName))
+                        .treat());
+            } else {
+                sender.sendMessage(new ColoredText(
+                        lang.getString("unknown-file")
+                                .replaceAll("\\{filename}", fileName))
+                        .treat());
+            }
+        } else {
+            cm.reloadFiles();
+            sender.sendMessage(new ColoredText(lang.getString("reload-all")).treat());
+        }
+    }
+
     @Subcommand("file")
     @CommandPermission(basePermission + ".file")
     @CommandCompletion("@players VanillaTrade.yml")

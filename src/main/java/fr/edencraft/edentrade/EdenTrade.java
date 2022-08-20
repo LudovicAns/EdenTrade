@@ -4,8 +4,12 @@ import co.aikar.commands.PaperCommandManager;
 import fr.edencraft.edentrade.command.EdenTradeCommand;
 import fr.edencraft.edentrade.manager.ConfigurationManager;
 import fr.edencraft.edentrade.trade.Trade;
+import fr.edencraft.edentrade.utils.CommandCompletionUtils;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -34,6 +38,17 @@ public final class EdenTrade extends JavaPlugin {
 
         PaperCommandManager commandManager = new PaperCommandManager(this);
         commandManager.registerCommand(new EdenTradeCommand());
+        commandManager.getCommandCompletions().registerAsyncCompletion(
+                "etreload",
+                context -> {
+                    CommandSender sender = context.getSender();
+                    if (sender instanceof Player) {
+                        Player player = (Player) sender;
+                        player.playSound(player.getLocation(), Sound.BLOCK_WOODEN_BUTTON_CLICK_ON, 1, 1);
+                    }
+                    return CommandCompletionUtils.getConfigurationFilesName();
+                }
+        );
     }
 
     @Override
