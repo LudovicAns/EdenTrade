@@ -15,4 +15,15 @@ public class CommandCompletionUtils {
         return cfgList;
     }
 
+    public static List<String> getTradesFile() {
+        List<String> tradesFileList = new ArrayList<>();
+        ConfigurationManager cm = EdenTrade.getINSTANCE().getConfigurationManager();
+        cm.getFilesMap().forEach((file, fileConfiguration) -> {
+            if (fileConfiguration.contains("result")) {
+                tradesFileList.add(file.getName());
+            }
+        });
+        return tradesFileList;
+    }
+
 }

@@ -62,7 +62,7 @@ public class EdenTradeCommand extends BaseCommand {
 
     @Subcommand("file")
     @CommandPermission(basePermission + ".file")
-    @CommandCompletion("@players VanillaTrade.yml")
+    @CommandCompletion("@players @ettradesfile")
     public static void onCustomTrade(CommandSender sender, String playerName, String fileName) {
         FileConfiguration cfg = cm.getConfigurationFile(fileName);
         FileConfiguration lang = cm.getConfigurationFile("Fr.yml");

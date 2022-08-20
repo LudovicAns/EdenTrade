@@ -49,6 +49,13 @@ public final class EdenTrade extends JavaPlugin {
                     return CommandCompletionUtils.getConfigurationFilesName();
                 }
         );
+        commandManager.getCommandCompletions().registerAsyncCompletion(
+                "ettradesfile",
+                context -> {
+                    CommandSender sender = context.getSender();
+                    return CommandCompletionUtils.getTradesFile();
+                }
+        );
     }
 
     @Override
