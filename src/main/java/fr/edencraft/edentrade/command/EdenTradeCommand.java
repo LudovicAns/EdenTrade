@@ -4,7 +4,6 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import dev.lone.itemsadder.api.CustomStack;
 import fr.edencraft.edentrade.EdenTrade;
-import fr.edencraft.edentrade.content.lang.Fr;
 import fr.edencraft.edentrade.manager.ConfigurationManager;
 import fr.edencraft.edentrade.trade.Trade;
 import fr.edencraft.edentrade.trade.TradeBuildException;
@@ -36,22 +35,41 @@ public class EdenTradeCommand extends BaseCommand {
         commandSender.sendMessage(getHelpMessage());
     }
 
-    @Subcommand("test")
-    @CommandPermission(basePermission + ".test")
-    public static void onTest(CommandSender sender) {
-        ItemStack swordFullDura = new ItemStack(Material.DIAMOND_SWORD);
-        ItemStack swordDamaged = new ItemStack(Material.DIAMOND_SWORD);
-        // swordDamaged.setDurability((short) 100);
-        sender.sendMessage(String.valueOf(swordFullDura.equals(swordDamaged)));
+    @Subcommand("reload|rl")
+    @Syntax("[fileName]")
+    @CommandCompletion("@etreload")
+    @CommandPermission(basePermission + ".reload")
+    public static void onReload(CommandSender sender, @Optional String fileName){
+        FileConfiguration lang = cm.getConfigurationFile("Fr.yml");
+        if (fileName != null && !fileName.isEmpty()) {
+            if (cm.getConfigurationFile(fileName) != null) {
+                cm.reloadFile(fileName);
+                sender.sendMessage(new ColoredText(
+                        lang.getString("reload-file")
+                                .replaceAll("\\{filename}", fileName))
+                        .treat());
+            } else {
+                sender.sendMessage(new ColoredText(
+                        lang.getString("unknown-file")
+                                .replaceAll("\\{filename}", fileName))
+                        .treat());
+            }
+        } else {
+            cm.reloadFiles();
+            sender.sendMessage(new ColoredText(lang.getString("reload-all")).treat());
+        }
     }
 
     @Subcommand("file")
     @CommandPermission(basePermission + ".file")
-    @CommandCompletion("@players VanillaTrade.yml")
+    @CommandCompletion("@players @ettradesfile")
     public static void onCustomTrade(CommandSender sender, String playerName, String fileName) {
         FileConfiguration cfg = cm.getConfigurationFile(fileName);
+        FileConfiguration lang = cm.getConfigurationFile("Fr.yml");
         if (cfg == null) {
-            sender.sendMessage("Error. Need to be added in " + Fr.class);
+            sender.sendMessage(
+                    new ColoredText(lang.getString("unknown-trade-file").replaceAll("\\{0}", fileName)).treat()
+            );
             return;
         }
 
@@ -72,24 +90,27 @@ public class EdenTradeCommand extends BaseCommand {
         Player player = (Player) offlinePlayer;
 
         if (!playerHadRequiredPermissions(trade.getRequiredPermissions(), player)) {
-            // Need perm
-            player.sendMessage("No perm");
+            player.sendMessage(
+                    new ColoredText(lang.getString("missing-trade-permissions")).treat()
+            );
             return;
         }
 
         if (!playerHadRequiredItems(trade.getRequiredItems(), player)) {
-            // Missing items.
-            player.sendMessage("Missing items");
+            player.sendMessage(
+                    new ColoredText(lang.getString("missing-trade-items")).treat()
+            );
             return;
         }
 
-        if (!playerHadEnoughPlace(trade.getResultItems().size(), player.getInventory())) {
-            // Not enough place
-            player.sendMessage("Vous n'avavez pas assez de place dans votre inventaire.");
+        if (!playerHadEnoughPlace(trade.getResultItems().size() + trade.getExtraSlotNeeded(), player.getInventory())) {
+            player.sendMessage(
+                    new ColoredText(lang.getString("missing-inventory-space")).treat()
+            );
             return;
         }
         removeRequiredItemsFromPlayer(trade.getRequiredItems(), player);
-        giveResultItemToPlayer(trade.getResultItems(), player);
+        giveResultItemToPlayer(trade.getResultItems(), trade.getResultCommands(), player);
         giveResultPermissionToPlayer(trade.getResultPermissions(), player);
     }
 
@@ -100,8 +121,11 @@ public class EdenTradeCommand extends BaseCommand {
         });
     }
 
-    private static void giveResultItemToPlayer(Set<ItemStack> resultItems, Player player) {
+    private static void giveResultItemToPlayer(Set<ItemStack> resultItems, Set<String> resultCommands, Player player) {
         resultItems.forEach(itemStack -> player.getInventory().addItem(itemStack));
+        resultCommands.forEach(command -> Bukkit.dispatchCommand(
+                Bukkit.getConsoleSender(), command.replaceAll("\\{player}", player.getName())
+        ));
     }
 
     private static void removeRequiredItemsFromPlayer(Set<ItemStack> requiredItems, Player player) {

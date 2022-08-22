@@ -14,18 +14,25 @@ public class Trade {
     private Set<ItemStack> resultItems;
     private Map<String, Boolean> resultPermissions;
 
+    private Set<String> resultCommands;
+    private int extraSlotNeeded;
+
     private boolean init = false;
 
     public Trade(String name,
                  Set<ItemStack> requiredItems,
                  Map<String, Boolean> requiredPermissions,
                  Set<ItemStack> resultItems,
-                 Map<String, Boolean> resultPermissions) {
+                 Map<String, Boolean> resultPermissions,
+                 Set<String> resultCommands,
+                 int extraSlotNeeded) {
         this.name = name;
         this.requiredItems = requiredItems;
         this.requiredPermissions = requiredPermissions;
         this.resultItems = resultItems;
         this.resultPermissions = resultPermissions;
+        this.resultCommands = resultCommands;
+        this.extraSlotNeeded = extraSlotNeeded;
     }
 
     public boolean isInit() {
@@ -50,5 +57,13 @@ public class Trade {
 
     public Map<String, Boolean> getResultPermissions() {
         return resultPermissions;
+    }
+
+    public Set<String> getResultCommands() {
+        return resultCommands;
+    }
+
+    public int getExtraSlotNeeded() {
+        return extraSlotNeeded;
     }
 }
