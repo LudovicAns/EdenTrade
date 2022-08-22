@@ -154,6 +154,7 @@ public class TradeBuilder {
 
     private @Nullable ItemStack buildCustomItem(ConfigurationSection section) {
         String itemPath = section.getString("item");
+        int amount = section.getInt("amount", 1);
 
         // Because we only use itemsadder item.
         if (!itemPath.split(":")[0].equalsIgnoreCase("itemsadder")) {
@@ -171,9 +172,10 @@ public class TradeBuilder {
             return null;
         }
 
-        CustomStack customStack = CustomStack.getInstance(namespaceName + ":" + itemName);
+        ItemStack itemStack = CustomStack.getInstance(namespaceName + ":" + itemName).getItemStack();
+        itemStack.setAmount(amount);
 
-        return customStack.getItemStack();
+        return itemStack;
     }
 
 }

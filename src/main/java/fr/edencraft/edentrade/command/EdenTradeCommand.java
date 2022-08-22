@@ -142,15 +142,21 @@ public class EdenTradeCommand extends BaseCommand {
                 if (isItemsAdderItem && CustomStack.byItemStack(inventoryItem) != null) {
                     if (isEqual(CustomStack.byItemStack(item), CustomStack.byItemStack(inventoryItem))) {
                         int amount = inventoryItem.getAmount();
-                        if (amount < amountNeeded) inventoryItem.setAmount(0);
-                        else inventoryItem.setAmount(amount - amountNeeded);
+                        if (amount < amountNeeded) {
+                            inventoryItem.setAmount(0);
+                        } else {
+                            inventoryItem.setAmount(amount - amountNeeded);
+                        }
                         amountNeeded -= amount;
                     }
                 } else if (!isItemsAdderItem && CustomStack.byItemStack(inventoryItem) == null) {
                     if (isEqual(item, inventoryItem)) {
                         int amount = inventoryItem.getAmount();
-                        if (amount < amountNeeded) inventoryItem.setAmount(0);
-                        else inventoryItem.setAmount(amount - amountNeeded);
+                        if (amount < amountNeeded) {
+                            inventoryItem.setAmount(0);
+                        } else {
+                            inventoryItem.setAmount(amount - amountNeeded);
+                        }
                         amountNeeded -= amount;
                     }
                 }
