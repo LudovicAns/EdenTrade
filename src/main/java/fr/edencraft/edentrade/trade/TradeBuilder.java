@@ -165,7 +165,8 @@ public class TradeBuilder {
         String namespaceName = itemPath.split(":")[1].split("__")[0];
         String itemName = itemPath.split(":")[1].split("__")[1];
 
-        if (CustomStack.getInstance(namespaceName + ":" + itemName).getItemStack() == null) {
+        if (CustomStack.getInstance(namespaceName + ":" + itemName) == null
+                || CustomStack.getInstance(namespaceName + ":" + itemName).getItemStack() == null) {
             // Throw error ? Invalid custom item.
             return null;
         }

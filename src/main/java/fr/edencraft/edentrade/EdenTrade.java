@@ -1,6 +1,7 @@
 package fr.edencraft.edentrade;
 
 import co.aikar.commands.PaperCommandManager;
+import dev.lone.itemsadder.api.ItemsAdder;
 import fr.edencraft.edentrade.command.EdenTradeCommand;
 import fr.edencraft.edentrade.manager.ConfigurationManager;
 import fr.edencraft.edentrade.trade.Trade;
@@ -34,6 +35,9 @@ public final class EdenTrade extends JavaPlugin {
         RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
         if (provider != null) {
             luckPermsAPI = provider.getProvider();
+        } else {
+            log(Level.SEVERE, "Missing Luckperms.");
+            Bukkit.getPluginManager().disablePlugin(this);
         }
 
         PaperCommandManager commandManager = new PaperCommandManager(this);
