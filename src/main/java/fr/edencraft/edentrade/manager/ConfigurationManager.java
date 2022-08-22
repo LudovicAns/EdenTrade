@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -41,6 +42,17 @@ public class ConfigurationManager {
         initNewFile("lang", Fr.class.getSimpleName() + ".yml", Fr.CONTENT);
         initNewFile("trades", VanillaTrade.class.getSimpleName() + ".yml", VanillaTrade.CONTENT);
         initNewFile("trades", CustomTrade.class.getSimpleName() + ".yml", CustomTrade.CONTENT);
+        loadTradeFiles();
+    }
+
+
+    public void loadTradeFiles() {
+        char sep = File.separatorChar;
+        File file = new File(EdenTrade.getINSTANCE().getDataFolder().getAbsolutePath() + sep + "trades");
+        Arrays.stream(file.listFiles()).forEach(f -> {
+            YamlConfiguration fileCFG = YamlConfiguration.loadConfiguration(f);
+            filesMap.put(f, fileCFG);
+        });
     }
 
 
@@ -81,7 +93,6 @@ public class ConfigurationManager {
         }
 
         YamlConfiguration fileCFG = YamlConfiguration.loadConfiguration(file);
-        System.out.println(fileCFG.getName());
         filesMap.put(file, fileCFG);
     }
 

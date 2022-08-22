@@ -3,7 +3,9 @@ package fr.edencraft.edentrade.utils;
 import fr.edencraft.edentrade.EdenTrade;
 import fr.edencraft.edentrade.manager.ConfigurationManager;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CommandCompletionUtils {
@@ -17,12 +19,9 @@ public class CommandCompletionUtils {
 
     public static List<String> getTradesFile() {
         List<String> tradesFileList = new ArrayList<>();
-        ConfigurationManager cm = EdenTrade.getINSTANCE().getConfigurationManager();
-        cm.getFilesMap().forEach((file, fileConfiguration) -> {
-            if (fileConfiguration.contains("result")) {
-                tradesFileList.add(file.getName());
-            }
-        });
+        char sep = File.separatorChar;
+        File file = new File(EdenTrade.getINSTANCE().getDataFolder().getAbsolutePath() + sep + "trades");
+        Arrays.stream(file.listFiles()).forEach(f -> tradesFileList.add(f.getName()));
         return tradesFileList;
     }
 
